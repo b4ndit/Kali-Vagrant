@@ -1,0 +1,7 @@
+{
+  "iso_url": "KALI_ISO_URL",
+  "iso_checksum": "SHA256CHECKSUM",
+  "cloud_token": "VAGRANT_CLOUD_TOKEN",
+  "cloud_box": "kalilinux/rolling",
+  "cloud_version": "X.Y.Z"
+}
