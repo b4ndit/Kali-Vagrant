@@ -1,8 +1,2 @@
-kali-vars.json
-
-packer_cache
-*.box
-
-.DS_Store
-*.swp
-.idea
+.vagrant
+data

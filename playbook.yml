@@ -1,0 +1,62 @@
+---
+- name: Playbook to provision Kali instance
+  hosts: all
+  become: yes
+  become_user: root
+
+  vars:
+    user: vagrant
+    ansible_python_interpreter: /usr/bin/python3
+
+  handlers:
+    - name: restart sshd
+      service: name=sshd state=restarted
+
+  tasks:
+    - name: Update apt-get repo and cache
+      apt: update_cache=yes
+    - name: Installing some apt packages
+      apt:
+        pkg:
+          - terminator
+          - ncat
+          - xsel
+    - name: Update Kali desktop wallpaper
+      xfconf:
+        channel: xfce4-desktop
+        property: /backdrop/screen0/monitorVirtual1/workspace0/last-image
+        value_type: string
+        value: /usr/share/backgrounds/kali-16x9/kali-ascii.png
+      become_user: "{{ user }}"
+      environment:
+        DBUS_SESSION_BUS_ADDRESS: unix:path=/run/user/1000/bus
+    - name: Disable SSH password authentication
+      lineinfile:
+        path: "/etc/ssh/sshd_config"
+        regex: ^(# *)?PasswordAuthentication
+        line: PasswordAuthentication no
+      notify:
+        - restart sshd
+    - name: Generate /home/{{ user }}/.ssh/id_rsa SSH key
+      command: ssh-keygen -t rsa -N "" -f /home/{{ user }}/.ssh/id_rsa
+      become_user: "{{ user }}"
+      args:
+        creates: /home/{{ user }}/.ssh/id_rsa
+    - name: Add aliases to zshrc file
+      lineinfile:
+        path: /home/{{ user }}/.zshrc
+        line: "{{ item }}"
+        owner: "{{ user }}"
+      loop:
+        - alias pyhttp='python3 -m http.server 80'
+        - alias ncl='nc -nvlp'
+        - alias smbshare='impacket-smbserver share `pwd`'
+        - alias htblabvpn='sudo openvpn /0ps/htb/vpn/lab_*.ovpn'
+        - alias htbrelvpn='sudo openvpn /0ps/htb/vpn/release_arena_*.ovpn'
+        - alias cls='clear'
+        - alias q='exit'
+        - alias open='xdg-open'
+        - alias json='python -m json.tool'
+        - alias pls='sudo `fc -n -l -1`'
+        - alias htbscan='sudo masscan -p1-65535,U:1-65535 --rate=1000 -e tun0'
+        - alias htbip='ip -4 addr show tun0 | grep -oP "(?<=inet\s)\d+(\.\d+){3}" | tee /dev/tty | tr -d "\n" | xsel -ib'
