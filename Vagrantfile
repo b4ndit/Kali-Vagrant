@@ -41,6 +41,7 @@ Vagrant.configure("2") do |config|
   # Bridged networks make the machine appear as another physical device on
   # your network.
   config.vm.network "public_network", bridge: "enp34s0"
+  # config.vm.network "public_network"
 
   # Share an additional folder to the guest VM. The first argument is
   # the path on the host to the actual folder. The second argument is
@@ -52,13 +53,12 @@ Vagrant.configure("2") do |config|
   # backing providers for Vagrant. These expose provider-specific options.
   # Example for VirtualBox:
   #
-  # config.vm.provider "virtualbox" do |vb|
-  #   # Display the VirtualBox GUI when booting the machine
-  #   vb.gui = true
-  #
-  #   # Customize the amount of memory on the VM:
-  #   vb.memory = "1024"
-  # end
+  config.vm.provider "virtualbox" do |vb|
+   # Display the VirtualBox GUI when booting the machine
+   vb.gui = true
+   # Customize the amount of memory on the VM:
+   vb.memory = "4096"
+  end
   #
   # View the documentation for the provider you are using for more
   # information on available options.
@@ -73,7 +73,7 @@ Vagrant.configure("2") do |config|
    apt-get -y dist-upgrade
    apt-get -y autoremove
   SHELL
-  config.vm.provision "ansible" do |ansible|
+  config.vm.provision "ansible_local" do |ansible|
     ansible.playbook = "playbook.yml"
   end
 end
